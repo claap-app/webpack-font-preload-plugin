@@ -32,7 +32,7 @@ declare namespace WebpackFontPreloadPlugin {
      *
      * Defaults to "index.html".
      */
-    index?: string;
+    index?: string | RegExp;
 
     /**
      * Default font extensions which should be used.

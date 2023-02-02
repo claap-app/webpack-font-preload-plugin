@@ -51,7 +51,16 @@ class WebpackFontPreloadPlugin {
       if (this.options.index) {
         const { assets, outputOptions } = compilation;
         const assetNames = assets && (Object.keys(assets) || []);
-        const index = assets[this.options.index];
+        let index;
+        let indexKey;
+        if (this.options.index instanceof RegExp) {
+          const assetsKeys = Object.keys(assets);
+          indexKey = assetsKeys.find((assetKey) => this.options.index.test(assetKey))
+          index = assets[indexKey]
+        } else {
+          indexKey = this.options.index
+          index = assets[indexKey];
+        }
         const indexSource = index && index.source();
         const publicPath = (outputOptions && outputOptions.publicPath) || "";
         if (indexSource) {
@@ -65,7 +74,7 @@ class WebpackFontPreloadPlugin {
           // index.html by using the generated link string.
           if (this.options.replaceCallback) {
             // @ts-ignore
-            assets[this.options.index] = new RawSource(
+            assets[indexKey] = new RawSource(
               this.options.replaceCallback({
                 indexSource: indexSource.toString(),
                 linksAsString: strLink,
@@ -73,7 +82,7 @@ class WebpackFontPreloadPlugin {
             );
           } else {
             // @ts-ignore
-            assets[this.options.index] = new RawSource(
+            assets[indexKey] = new RawSource(
               this.appendLinks(indexSource.toString(), strLink)
             );
           }
